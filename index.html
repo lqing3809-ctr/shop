@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CC-🍎 个人主页与服务导航</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #007aff;
+            --bg-color: #f5f5f7;
+            --card-bg: #ffffff;
+            --text-main: #1d1d1f;
+            --text-sub: #86868b;
+            --border-radius: 18px;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-color: #000000;
+                --card-bg: #1c1c1e;
+                --text-main: #f5f5f7;
+                --text-sub: #86868b;
+                --shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            }
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px 15px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 460px;
+            margin: 0 auto;
+        }
+
+        /* Profile Header */
+        .profile-card {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .avatar {
+            width: 88px;
+            height: 88px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+            font-size: 40px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            border: 3px solid #fff;
+        }
+
+        .profile-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .profile-desc {
+            font-size: 14px;
+            color: var(--text-sub);
+            line-height: 1.4;
+        }
+
+        /* Quick Action Grid */
+        .contact-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 14px 16px;
+            border-radius: var(--border-radius);
+            font-size: 15px;
+            font-weight: 600;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: var(--shadow);
+        }
+
+        .btn:active {
+            transform: scale(0.97);
+        }
+
+        .btn-wechat {
+            background-color: #07c160;
+            color: #ffffff;
+        }
+
+        .btn-whatsapp {
+            background-color: #25d366;
+            color: #ffffff;
+        }
+
+        .btn-proxy {
+            grid-column: span 2;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: #ffffff;
+        }
+
+        /* Service Cards */
+        .section-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-sub);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin: 24px 0 12px 6px;
+        }
+
+        .card-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 18px;
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            transition: transform 0.2s;
+        }
+
+        .card-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .icon-apple { background-color: rgba(255, 45, 85, 0.1); color: #ff2d55; }
+        .icon-net { background-color: rgba(0, 122, 255, 0.1); color: #007aff; }
+        .icon-acc { background-color: rgba(255, 149, 0, 0.1); color: #ff9500; }
+
+        .card-content {
+            flex: 1;
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .card-desc {
+            font-size: 13px;
+            color: var(--text-sub);
+            line-height: 1.4;
+        }
+
+        /* Modal for QR Code */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background-color: #ffffff;
+            border-radius: 24px;
+            padding: 24px;
+            text-align: center;
+            max-width: 320px;
+            width: 100%;
+            color: #1d1d1f;
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            font-size: 20px;
+            color: #86868b;
+            cursor: pointer;
+        }
+
+        .qr-img {
+            width: 200px;
+            height: 200px;
+            margin: 16px 0;
+            border-radius: 12px;
+        }
+
+        /* Toast Notice */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background-color: rgba(0, 0, 0, 0.8);
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 14px;
+            transition: transform 0.3s ease;
+            z-index: 200;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 32px;
+            font-size: 12px;
+            color: var(--text-sub);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- 头部信息 -->
+        <div class="profile-card">
+            <div class="avatar">🍎</div>
+            <div class="profile-title">CC-🍎</div>
+            <div class="profile-desc">专业账号提供 · 售后保障 · 快速响应</div>
+        </div>
+
+        <!-- 快捷联系按钮组 -->
+        <div class="contact-grid">
+            <button class="btn btn-wechat" onclick="copyWeChat()">
+                <i class="fa-brands fa-weixin"></i> 复制微信
+            </button>
+            <button class="btn btn-whatsapp" onclick="openWhatsApp()">
+                <i class="fa-brands fa-whatsapp"></i> WhatsApp
+            </button>
+            <a href="https://47.243.165.123:56783/#/register?code=cQbfMsau" target="_blank" class="btn btn-proxy">
+                <i class="fa-solid fa-rocket"></i> 梯子/加速器注册入口
+            </a>
+        </div>
+
+        <!-- 主营业务 -->
+        <div class="section-title">主营服务展示</div>
+        <div class="card-list">
+            
+            <div class="card">
+                <div class="card-icon icon-apple">
+                    <i class="fa-brands fa-apple"></i>
+                </div>
+                <div class="card-content">
+                    <div class="card-title">苹果 Apple ID 账号</div>
+                    <div class="card-desc">提供外区专属苹果账号、美区/港区等海外 Apple ID，稳定耐用。</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-icon icon-acc">
+                    <i class="fa-solid fa-user-check"></i>
+                </div>
+                <div class="card-content">
+                    <div class="card-title">优质各类精品账号</div>
+                    <div class="card-desc">一手资源，极速发货。如有任何需求或定制账号欢迎微信/WhatsApp咨询。</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-icon icon-net">
+                    <i class="fa-solid fa-bolt"></i>
+                </div>
+                <div class="card-content">
+                    <div class="card-title">高速稳定梯子加速器</div>
+                    <div class="card-desc">支持全平台节点订阅，超高带宽，流畅访问全球网络（点击下方按钮直接注册）。</div>
+                </div>
+            </div>
+
+        </div>
+
+        <footer>
+            © 2026 CC-🍎 All Rights Reserved.
+        </footer>
+    </div>
+
+    <!-- 提示框 -->
+    <div id="toast" class="toast">微信号已复制到剪贴板！</div>
+
+    <!-- 二维码弹窗 -->
+    <div id="qrModal" class="modal" onclick="closeModal()">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <span class="modal-close" onclick="closeModal()">&times;</span>
+            <h3 style="margin-top: 8px;">WhatsApp 扫码添加</h3>
+            <img class="qr-img" src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://wa.me/qr/KC2XM5YFFPU4M1?s=r" alt="WhatsApp QR Code">
+            <p style="font-size: 13px; color: #86868b;">如无法直接跳转，请截屏后使用 WhatsApp 扫描</p>
+        </div>
+    </div>
+
+    <script>
+        const wechatId = "Xapple88X";
+        const whatsappUrl = "https://wa.me/qr/KC2XM5YFFPU4M1?s=r";
+
+        // 复制微信号
+        function copyWeChat() {
+            navigator.clipboard.writeText(wechatId).then(() => {
+                showToast("微信号已复制: " + wechatId);
+            }).catch(err => {
+                // 兼容旧版浏览器
+                const textArea = document.createElement("textarea");
+                textArea.value = wechatId;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand("copy");
+                document.body.removeChild(textArea);
+                showToast("微信号已复制: " + wechatId);
+            });
+        }
+
+        // 打开 WhatsApp（如果是在移动端且无法跳转，则弹窗显示二维码）
+        function openWhatsApp() {
+            window.location.href = whatsappUrl;
+            // 如果一段时间没跳转（部分浏览器屏蔽），弹窗补救
+            setTimeout(() => {
+                document.getElementById('qrModal').style.display = 'flex';
+            }, 1500);
+        }
+
+        function closeModal() {
+            document.getElementById('qrModal').style.display = 'none';
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById("toast");
+            toast.innerText = msg;
+            toast.classList.add("show");
+            setTimeout(() => {
+                toast.classList.remove("show");
+            }, 2500);
+        }
+    </script>
+</body>
+</html>
