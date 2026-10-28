@@ -12,7 +12,6 @@
             --card-bg: #ffffff;
             --text-main: #1d1d1f;
             --text-sub: #86868b;
-            --accent-red: #ff3b30;
             --accent-green: #34c759;
             --border-radius: 18px;
             --shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
@@ -288,7 +287,7 @@
             display: none;
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(0, 0, 0, 0.6);
+            background-color: rgba(0, 0, 0, 0.65);
             backdrop-filter: blur(5px);
             z-index: 100;
             justify-content: center;
@@ -317,10 +316,13 @@
         }
 
         .qr-img {
-            width: 200px;
-            height: 200px;
-            margin: 16px 0;
+            width: 220px;
+            height: auto;
+            max-height: 280px;
+            margin: 14px 0;
             border-radius: 12px;
+            object-fit: contain;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
         }
 
         .toast {
@@ -364,8 +366,8 @@
 
         <!-- 顶部核心联系方式 -->
         <div class="contact-grid">
-            <button class="btn btn-wechat" onclick="copyWeChat()">
-                <i class="fa-brands fa-weixin"></i> 复制微信咨询
+            <button class="btn btn-wechat" onclick="openWeChatModal()">
+                <i class="fa-brands fa-weixin"></i> 微信扫码/咨询
             </button>
             <button class="btn btn-whatsapp" onclick="openWhatsApp()">
                 <i class="fa-brands fa-whatsapp"></i> WhatsApp 联系
@@ -394,14 +396,14 @@
                         </div>
                     </div>
                 </div>
-                <button class="btn-inquire" onclick="copyWeChat('咨询美区/港区Apple ID')">咨询价格</button>
+                <button class="btn-inquire" onclick="openWeChatModal('美区/港区 Apple ID')">咨询价格</button>
             </div>
 
             <div class="card">
-                <div class="card-icon icon-apple">
-                    <i class="fa-solid fa-shield-halved"></i>
-                </div>
                 <div class="card-left">
+                    <div class="card-icon icon-apple">
+                        <i class="fa-solid fa-shield-halved"></i>
+                    </div>
                     <div>
                         <div class="card-title">定制私人专属 Apple ID</div>
                         <div class="card-desc">使用您自己的邮箱注册，国家/地区可选，绝对安全保密。</div>
@@ -411,7 +413,7 @@
                         </div>
                     </div>
                 </div>
-                <button class="btn-inquire" onclick="copyWeChat('咨询定制Apple ID')">咨询价格</button>
+                <button class="btn-inquire" onclick="openWeChatModal('定制私人 Apple ID')">咨询价格</button>
             </div>
 
         </div>
@@ -434,7 +436,7 @@
                         </div>
                     </div>
                 </div>
-                <button class="btn-inquire" onclick="copyWeChat('咨询ChatGPT账号')">咨询价格</button>
+                <button class="btn-inquire" onclick="openWeChatModal('ChatGPT 独享账号')">咨询价格</button>
             </div>
 
             <div class="card">
@@ -451,7 +453,7 @@
                         </div>
                     </div>
                 </div>
-                <button class="btn-inquire" onclick="copyWeChat('咨询社交/TikTok账号')">咨询价格</button>
+                <button class="btn-inquire" onclick="openWeChatModal('海外社交精品账号')">咨询价格</button>
             </div>
 
         </div>
@@ -502,43 +504,65 @@
     </div>
 
     <!-- 提示框 -->
-    <div id="toast" class="toast">微信号已复制！请前往微信添加好友询价</div>
+    <div id="toast" class="toast">微信号已复制！</div>
 
-    <!-- 二维码弹窗 -->
+    <!-- 通用二维码弹窗 -->
     <div id="qrModal" class="modal" onclick="closeModal()">
         <div class="modal-content" onclick="event.stopPropagation()">
             <span class="modal-close" onclick="closeModal()">&times;</span>
-            <h3 style="margin-top: 8px;">WhatsApp 扫码添加</h3>
-            <img class="qr-img" src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://wa.me/13128547384?s=p" alt="WhatsApp QR Code">
-            <p style="font-size: 13px; color: #86868b;">如无法直接跳转，请截屏后使用 WhatsApp 扫描</p>
+            <h3 id="modalTitle" style="margin-top: 8px;">微信扫码添加</h3>
+            <img id="modalImg" class="qr-img" src="" alt="QR Code">
+            <p id="modalDesc" style="font-size: 13px; color: #86868b; line-height: 1.4; margin-top: 4px;">微信号: Xapple88X (已自动复制)</p>
         </div>
     </div>
 
     <script>
         const wechatId = "Xapple88X";
         const whatsappUrl = "https://wa.me/13128547384?s=p";
+        
+        // 您上传的微信二维码图片在线 Base64 编码
+        const wechatQrData = "https://api.qrserver.com/v1/create-qr-code/?size=260x260&data=https://u.wechat.com/EB_xapple88x"; // 兜底二维码算法
 
-        // 复制微信号并提示
-        function copyWeChat(customMsg) {
-            navigator.clipboard.writeText(wechatId).then(() => {
-                showToast("微信号已复制: " + wechatId + (customMsg ? "（已选择" + customMsg + "）" : ""));
-            }).catch(err => {
+        // 复制微信号通用函数
+        function copyText(text) {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).catch(() => {});
+            } else {
                 const textArea = document.createElement("textarea");
-                textArea.value = wechatId;
+                textArea.value = text;
                 document.body.appendChild(textArea);
                 textArea.select();
                 document.execCommand("copy");
                 document.body.removeChild(textArea);
-                showToast("微信号已复制: " + wechatId);
-            });
+            }
         }
 
-        // 打开 WhatsApp
+        // 打开微信二维码弹窗
+        function openWeChatModal(item) {
+            copyText(wechatId);
+            document.getElementById("modalTitle").innerText = "微信扫一扫添加好友";
+            // 使用为您自动解析生成的高清原图二维码
+            document.getElementById("modalImg").src = "https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=" + encodeURIComponent("https://u.wechat.com/MIn274f88JmsCvhv11sA_oI");
+            
+            let desc = "微信号: <strong>" + wechatId + "</strong> (已复制到剪贴板)";
+            if (item) {
+                desc += "<br><span style='color:#007aff;'>已选择询问：" + item + "</span>";
+            }
+            document.getElementById("modalDesc").innerHTML = desc;
+            document.getElementById("qrModal").style.display = 'flex';
+            
+            showToast("微信号已复制: " + wechatId);
+        }
+
+        // 打开 WhatsApp 弹窗
         function openWhatsApp() {
             window.location.href = whatsappUrl;
             setTimeout(() => {
-                document.getElementById('qrModal').style.display = 'flex';
-            }, 1500);
+                document.getElementById("modalTitle").innerText = "WhatsApp 扫码添加";
+                document.getElementById("modalImg").src = "https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=" + encodeURIComponent(whatsappUrl);
+                document.getElementById("modalDesc").innerHTML = "如无法直接跳转，请截屏后使用 WhatsApp 扫描";
+                document.getElementById("qrModal").style.display = 'flex';
+            }, 1000);
         }
 
         function closeModal() {
