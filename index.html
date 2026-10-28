@@ -315,14 +315,22 @@
             cursor: pointer;
         }
 
+        .qr-container {
+            position: relative;
+            width: 230px;
+            height: 230px;
+            margin: 14px auto;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+            border: 1px solid #eee;
+        }
+
         .qr-img {
-            width: 220px;
-            height: auto;
-            max-height: 280px;
-            margin: 14px 0;
-            border-radius: 12px;
+            width: 100%;
+            height: 100%;
             object-fit: contain;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            display: block;
         }
 
         .toast {
@@ -511,7 +519,9 @@
         <div class="modal-content" onclick="event.stopPropagation()">
             <span class="modal-close" onclick="closeModal()">&times;</span>
             <h3 id="modalTitle" style="margin-top: 8px;">微信扫码添加</h3>
-            <img id="modalImg" class="qr-img" src="" alt="QR Code">
+            <div class="qr-container">
+                <img id="modalImg" class="qr-img" src="" alt="QR Code">
+            </div>
             <p id="modalDesc" style="font-size: 13px; color: #86868b; line-height: 1.4; margin-top: 4px;">微信号: Xapple88X (已自动复制)</p>
         </div>
     </div>
@@ -520,10 +530,9 @@
         const wechatId = "Xapple88X";
         const whatsappUrl = "https://wa.me/13128547384?s=p";
         
-        // 您上传的微信二维码图片在线 Base64 编码
-        const wechatQrData = "https://api.qrserver.com/v1/create-qr-code/?size=260x260&data=https://u.wechat.com/EB_xapple88x"; // 兜底二维码算法
+        // 您的微信名片链接（精准生成高识别率二维码）
+        const wechatQrUrl = "https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=10&data=" + encodeURIComponent("https://u.wechat.com/Xapple88X");
 
-        // 复制微信号通用函数
         function copyText(text) {
             if (navigator.clipboard && navigator.clipboard.writeText) {
                 navigator.clipboard.writeText(text).catch(() => {});
@@ -541,12 +550,11 @@
         function openWeChatModal(item) {
             copyText(wechatId);
             document.getElementById("modalTitle").innerText = "微信扫一扫添加好友";
-            // 使用为您自动解析生成的高清原图二维码
-            document.getElementById("modalImg").src = "https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=" + encodeURIComponent("https://u.wechat.com/MIn274f88JmsCvhv11sA_oI");
+            document.getElementById("modalImg").src = wechatQrUrl;
             
-            let desc = "微信号: <strong>" + wechatId + "</strong> (已复制到剪贴板)";
+            let desc = "微信号: <strong style='color:#07c160; font-size:15px;'>" + wechatId + "</strong> (已复制到剪贴板)";
             if (item) {
-                desc += "<br><span style='color:#007aff;'>已选择询问：" + item + "</span>";
+                desc += "<br><span style='color:#007aff; font-weight:600;'>已选择询问：" + item + "</span>";
             }
             document.getElementById("modalDesc").innerHTML = desc;
             document.getElementById("qrModal").style.display = 'flex';
@@ -559,7 +567,7 @@
             window.location.href = whatsappUrl;
             setTimeout(() => {
                 document.getElementById("modalTitle").innerText = "WhatsApp 扫码添加";
-                document.getElementById("modalImg").src = "https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=" + encodeURIComponent(whatsappUrl);
+                document.getElementById("modalImg").src = "https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=10&data=" + encodeURIComponent(whatsappUrl);
                 document.getElementById("modalDesc").innerHTML = "如无法直接跳转，请截屏后使用 WhatsApp 扫描";
                 document.getElementById("qrModal").style.display = 'flex';
             }, 1000);
